@@ -1,6 +1,7 @@
 <launch>
 	<arg name="robot_namespace"  	default="drone0" />
 	<arg name="robot_config_path" 	default="$(env AEROSTACK_STACK)/configs/$(arg robot_namespace)" />
+	<arg name="rviz_config_path" 	default="$(find droneArchitectureRvizROSModule)/launch" />
 	<arg name="frequency" 			default="200.0" />
 
 	<!-- Config file -->
@@ -20,8 +21,14 @@
 	<arg name="flight_action" 	    default="actuator_command/flight_action" />
 	<arg name="flight_state" 	    default="self_localization/flight_state" />
 
+	<!-- Rviz -->
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config_path)/rviz_config.rviz"/>
+	<node name="droneArchitectureRvizInterface" pkg="droneArchitectureRvizROSModule" type="droneArchitectureRvizInterfaceROSModuleNode" output="screen">	
+  		<param name="drone_id_namespace" value="$(arg robot_namespace)" type="string" />
+	</node>
+
 	<group ns="$(arg robot_namespace)">
-		<node name="quadrotor_simulator" pkg="quadrotor_simulator_process" type="quadrotor_simulator_processNode" output="screen">
+		<node name="quadrotor_simulator" pkg="quadrotor_simulator_process" type="quadrotor_simulator_process_main" output="screen">
 			<param name="robot_namespace" 		value="$(arg robot_namespace)" 		type="string"/>
 			<param name="frequency" 			value="$(arg frequency)" 			type="double"/>
 			<param name="robot_config_path" 	value="$(arg robot_config_path)" 	type="string"/>
@@ -39,5 +46,6 @@
             <param name="flight_action"      	value="$(arg flight_action)"        type="string"/> 
             <param name="flight_state"       	value="$(arg flight_state)"         type="string"/>
 		</node>
+		<node name="rviz_translator_from_simulator" pkg="droneSimulatorRvizROSModule" type="SimulatorRvizROSModuleNode" respawn="false" required="true" output="screen"> </node>
 	</group>
 </launch>

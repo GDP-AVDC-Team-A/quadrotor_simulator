@@ -64,6 +64,9 @@ private: /*RobotProcess*/
 
 private:
     QuadrotorSimulator quadrotor_simulator;
+    ros::Time last_speed_time;
+    double pose_roll, pose_pitch, pose_yaw;
+    double last_roll, last_pitch, last_yaw;
 
     //Subscribers
     ros::Subscriber roll_pitch_sub;

@@ -29,6 +29,7 @@ void QuadrotorSimulatorProcess::ownSetUp()
     ros::param::get("~flight_state",flight_state_topic);
 
     quadrotor_simulator.init(robot_config_path+"/"+configFile);
+    last_speed_time.sec = 0;
 }
 
 double QuadrotorSimulatorProcess::get_moduleRate(){
@@ -53,27 +54,6 @@ void QuadrotorSimulatorProcess::ownStart(){
     pressure_pub = n.advertise<sensor_msgs::FluidPressure>(pressure_topic, 1, true);
     flight_state_pub = n.advertise<aerostack_msgs::FlightState>(flight_state_topic, 1, true);
     temperature_pub = n.advertise<sensor_msgs::Temperature>(temperature_topic, 1, true);
-
-
-
-    // //DEPRECATED
-    // //Subscribers
-    // PitchRollSubs=n.subscribe(QUADROTOR_SIMULATOR_COMMAND_DRONE_COMMAND_PITCH_ROLL, 1, &QuadrotorSimulatorProcess::pitchRollCallback, this);
-    // AltitudeSubs=n.subscribe(QUADROTOR_SIMULATOR_COMMAND_DRONE_COMMAND_DALTITUDE, 1, &QuadrotorSimulatorProcess::dAltitudeCallback, this);
-    // YawSubs=n.subscribe(QUADROTOR_SIMULATOR_COMMAND_DRONE_COMMAND_DYAW, 1, &QuadrotorSimulatorProcess::dYawCallback, this);
-    // CommandSubs=n.subscribe(QUADROTOR_SIMULATOR_COMMAND_DRONE_HL_COMMAND, 3, &QuadrotorSimulatorProcess::commandCallback, this);
-
-    // //Publishers
-    // ImuPubl = n.advertise<sensor_msgs::Imu>(QUADROTOR_SIMULATOR_SENSOR_IMU, 1, true);
-    // TemperaturePubl = n.advertise<sensor_msgs::Temperature>(QUADROTOR_SIMULATOR_SENSOR_TEMPERATURE, 1, true);
-    // MagnetometerPubl = n.advertise<geometry_msgs::Vector3Stamped>(QUADROTOR_SIMULATOR_SENSOR_MAGNETOMETER, 1, true);
-    // BatteryPubl = n.advertise<droneMsgsROS::battery>(QUADROTOR_SIMULATOR_SENSOR_BATTERY, 1, true);
-    // AltitudePubl = n.advertise<droneMsgsROS::droneAltitude>(QUADROTOR_SIMULATOR_SENSOR_ALTITUDE, 1, true);
-    // RotationAnglesPubl = n.advertise<geometry_msgs::Vector3Stamped>(QUADROTOR_SIMULATOR_SENSOR_ROTATION_ANGLES, 1, true);
-    // GroundSpeedPubl = n.advertise<droneMsgsROS::vector2Stamped>(QUADROTOR_SIMULATOR_SENSOR_GROUND_SPEED, 1, true);
-    // PressurePubl = n.advertise<sensor_msgs::FluidPressure>(QUADROTOR_SIMULATOR_SENSOR_PRESSURE, 1, true);
-    // DroneStatusPubl = n.advertise<droneMsgsROS::droneStatus>(QUADROTOR_SIMULATOR_SENSOR_STATUS, 1, true);
-    // InternalDronePosePubl = n.advertise<droneMsgsROS::dronePoseStamped>(QUADROTOR_SIMULATOR_INTERNAL_POSE, 1, true);
 }
 
 bool QuadrotorSimulatorProcess::resetValues(){
@@ -200,9 +180,9 @@ void QuadrotorSimulatorProcess::publishValues(){
 
 //ROTATION ANGLES
     //RotationAnglesMsgs.header.stamp=ros::Time::now();
-    double rotation_x,rotation_y, rotation_z;
-    quadrotor_simulator.DroneRotationAnglesSensor.getRotationAngles(rotation_z,rotation_y,rotation_x);
-    std::cout << "ROTATION ANGLES: " << rotation_x <<", "<<rotation_y<<", "<<rotation_x<<std::endl;
+    //double rotation_x,rotation_y, rotation_z;
+    //quadrotor_simulator.DroneRotationAnglesSensor.getRotationAngles(rotation_z,rotation_y,rotation_x);
+    //std::cout << "ROTATION ANGLES: " << rotation_x <<", "<<rotation_y<<", "<<rotation_x<<std::endl;
     //RotationAnglesPubl.publish(RotationAnglesMsgs);
 
 //SENSOR SPEED
@@ -220,10 +200,10 @@ publishFlightState();
 
 //POSE
     estimated_pose_msg.header.stamp=ros::Time::now();
-    double x, y, z, yaw, pitch, roll;
-    quadrotor_simulator.getPosition_drone_GMR_wrt_GFF(x, y, z, yaw, pitch, roll);
+    double x, y, z;
+    quadrotor_simulator.getPosition_drone_GMR_wrt_GFF(x, y, z, pose_yaw, pose_pitch, pose_roll);
 
-    tf::Quaternion quaternion = tf::createQuaternionFromRPY(roll,pitch,yaw);
+    tf::Quaternion quaternion = tf::createQuaternionFromRPY(pose_roll,pose_pitch,pose_yaw);
 
     estimated_pose_msg.pose.position.x = x;
     estimated_pose_msg.pose.position.y = y;
@@ -243,6 +223,18 @@ publishFlightState();
     estimated_speed_msg.twist.linear.x = dx;
     estimated_speed_msg.twist.linear.y = dy;
     estimated_speed_msg.twist.linear.z = dz;
+
+    if (last_speed_time.toSec() != 0){
+        ros::Duration diff = estimated_speed_msg.header.stamp - last_speed_time;
+        estimated_speed_msg.twist.angular.x = (pose_roll - last_roll)/diff.toSec();
+        estimated_speed_msg.twist.angular.y = (pose_pitch - last_pitch)/diff.toSec();
+        estimated_speed_msg.twist.angular.z = (pose_yaw - last_yaw)/diff.toSec();
+    }   
+
+    last_roll = pose_roll;
+    last_pitch = pose_pitch;
+    last_yaw = pose_yaw;
+    last_speed_time = estimated_speed_msg.header.stamp;
 
     estimated_speed_pub.publish(estimated_speed_msg);
 }
