@@ -6,8 +6,6 @@
 #include <iostream>
 #include "ros/ros.h"
 #include <robot_process.h>
-#include "communication_definition.h"
-#include "nodes_definition.h"
 #include <cmath>
 
 //Sensor
