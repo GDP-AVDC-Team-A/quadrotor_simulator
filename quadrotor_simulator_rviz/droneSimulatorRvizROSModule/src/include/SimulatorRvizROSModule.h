@@ -12,7 +12,6 @@
 #include <cstdlib>
 #include <stdio.h>
 #include "boost/ref.hpp"
-#include "communication_definition.h"
 
 using namespace visualization_msgs;
 

@@ -36,7 +36,7 @@ void DroneArchitectureRvizInterfaceROSModule::open(ros::NodeHandle &nIn, std::st
     std::cout << "El droneID es: " << droneId << std::endl;
     marker.setDroneId(droneId);
 
-    societyBroadcastSubs = n.subscribe( DRONE_ARCHITECTURE_RVIZ_INTERFACE_SOCIETY_BROADCAST_SUBSCRIPTION, 100, &DroneArchitectureRvizInterfaceROSModule::societyBroadcastCallback, this);
+    societyBroadcastSubs = n.subscribe( "/societyBroadcast", 100, &DroneArchitectureRvizInterfaceROSModule::societyBroadcastCallback, this);
     marker.ServerResetNew();
     ROS_INFO("Make Menu");
     marker.makeAxesMenu("GRF");

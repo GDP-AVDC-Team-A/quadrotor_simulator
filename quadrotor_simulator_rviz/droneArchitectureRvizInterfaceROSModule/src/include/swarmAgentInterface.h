@@ -9,7 +9,6 @@
 #include <iostream>
 #include <string>
 // Quadrotor Stack
-#include "communication_definition.h"
 // Msgs
 #include "droneMsgsROS/dronePose.h"
 #include "droneMsgsROS/dronePositionRefCommand.h"

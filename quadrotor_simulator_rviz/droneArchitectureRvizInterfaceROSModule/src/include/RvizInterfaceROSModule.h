@@ -2,7 +2,6 @@
 #define DRONEARCHITECTURERVIZROSMODULE_H
 
 #include "droneModuleROS.h"
-#include "communication_definition.h"
 #include "swarmAgentInterface.h"
 #include "std_msgs/Int32.h"
 #include <stdlib.h>

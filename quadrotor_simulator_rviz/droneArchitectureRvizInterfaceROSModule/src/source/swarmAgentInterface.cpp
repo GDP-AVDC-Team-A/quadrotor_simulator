@@ -23,10 +23,10 @@ void SwarmAgentInterface::open(ros::NodeHandle &nIn)
 
     n = nIn;
 
-    localizer_pose_subscriber                          = n.subscribe(std::string("/drone")+cvg_int_to_string(idDrone)+"/"+DRONE_ARCHITECTURE_RVIZ_INTERFACE_POSE_SUBSCRIPTION, 1, &SwarmAgentInterface::localizerPoseCallback, this);
-    mission_planner_mission_point_reference_subscriber = n.subscribe(std::string("/drone")+cvg_int_to_string(idDrone)+"/"+DRONE_ARCHITECTURE_RVIZ_INTERFACE_TRAJECTORY_ABS_REF_CMD_SUBSCRIPTION, 1, &SwarmAgentInterface::missionPointCallback, this);
-    trajectory_planner_trajectory_reference_subscriber = n.subscribe(std::string("/drone")+cvg_int_to_string(idDrone)+"/"+DRONE_ARCHITECTURE_RVIZ_INTERFACE_TRAJECTORY_ABS_REF_CMD_SUBSCRIPTION, 1, &SwarmAgentInterface::trajectoryAbsRefCmdCallback, this);
-    obstacle_processor_obstacle_list_subscriber        = n.subscribe(std::string("/drone")+cvg_int_to_string(idDrone)+"/"+DRONE_ARCHITECTURE_RVIZ_INTERFACE_OBSTACLE_LIST_SUBSCRIPTION, 1, &SwarmAgentInterface::obstacleListCallback, this);
+    localizer_pose_subscriber                          = n.subscribe(std::string("/drone")+cvg_int_to_string(idDrone)+"/"+"EstimatedPose_droneGMR_wrt_GFF", 1, &SwarmAgentInterface::localizerPoseCallback, this);
+    mission_planner_mission_point_reference_subscriber = n.subscribe(std::string("/drone")+cvg_int_to_string(idDrone)+"/"+"trajectoryControllerTrajectoryReferencesRebroadcast", 1, &SwarmAgentInterface::missionPointCallback, this);
+    trajectory_planner_trajectory_reference_subscriber = n.subscribe(std::string("/drone")+cvg_int_to_string(idDrone)+"/"+"trajectoryControllerTrajectoryReferencesRebroadcast", 1, &SwarmAgentInterface::trajectoryAbsRefCmdCallback, this);
+    obstacle_processor_obstacle_list_subscriber        = n.subscribe(std::string("/drone")+cvg_int_to_string(idDrone)+"/"+"obstacles", 1, &SwarmAgentInterface::obstacleListCallback, this);
 //    this_drone_society_pose_subscriber                 = n.subscribe(std::string("/drone")+cvg_int_to_string(idDrone)+"/"+DRONE_ARCHITECTURE_RVIZ_INTERFACE_SOCIETY_POSE_SUBSCRIPTION, 1, &SwarmAgentInterface::societyPoseSubCallback, this);
 
     return;
