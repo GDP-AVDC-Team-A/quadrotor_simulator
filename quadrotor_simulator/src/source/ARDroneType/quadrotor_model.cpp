@@ -327,9 +327,9 @@ void QuadrotorModel::jacobiansObservationModel(Matrix* MatJacHx, Vector* Statek)
 
 void QuadrotorModel::setInputs(double pitch_in, double roll_in, double dyaw_in, double dz_in)
 {
-    Inputs.setValueData( pitch_in, 1);
+    Inputs.setValueData( -pitch_in, 1);
     Inputs.setValueData( -roll_in, 2);
-    Inputs.setValueData( -dyaw_in, 3);
+    Inputs.setValueData( dyaw_in, 3);
     Inputs.setValueData(   -dz_in, 4);
 }
 
